@@ -2,7 +2,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -30,10 +30,22 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { transformOptions } from "@/lib/helper";
 import useWorkspaceId from "@/hooks/use-workspace-id";
+import { TaskPriorityEnum, TaskStatusEnum } from "@/constant";
 
-export default function CreateTaskForm(props: { projectId?: string }) {
-  const { projectId } = props;
+export default function CreateTaskForm(props: {
+  projectId?: string;
+  onClose: () => void;
+}) {
+  const { projectId, onClose } = props;
+
   const workspaceId = useWorkspaceId();
+
+  const isLoading = false;
+
+  //const projectOptions = []
+
+  // Workspace Memebers
+  //const membersOptions = []
 
   const formSchema = z.object({
     title: z.string().trim().min(1, {
@@ -43,12 +55,18 @@ export default function CreateTaskForm(props: { projectId?: string }) {
     projectId: z.string().trim().min(1, {
       message: "Project is required",
     }),
-    status: z.string().trim().min(1, {
-      message: "Status is required",
-    }),
-    priority: z.string().trim().min(1, {
-      message: "Priority is required",
-    }),
+    status: z.enum(
+      Object.values(TaskStatusEnum) as [keyof typeof TaskStatusEnum],
+      {
+        required_error: "Status is required",
+      }
+    ),
+    priority: z.enum(
+      Object.values(TaskPriorityEnum) as [keyof typeof TaskPriorityEnum],
+      {
+        required_error: "Priority is required",
+      }
+    ),
     assignedTo: z.string().trim().min(1, {
       message: "AssignedTo is required",
     }),
@@ -66,18 +84,15 @@ export default function CreateTaskForm(props: { projectId?: string }) {
     },
   });
 
-  const statusOptions = transformOptions([
-    "BACKLOG",
-    "TODO",
-    "IN_PROGRESS",
-    "IN_REVIEW",
-    "DONE",
-  ]);
+  const taskStatusList = Object.values(TaskStatusEnum);
+  const taskPriorityList = Object.values(TaskPriorityEnum); // ["LOW", "MEDIUM", "HIGH", "URGENT"]
 
-  const priorityOptions = transformOptions(["LOW", "MEDIUM", "HIGH", "URGENT"]);
+  const statusOptions = transformOptions(taskStatusList);
+  const priorityOptions = transformOptions(taskPriorityList);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values, { workspaceId: workspaceId });
+    onClose();
   };
 
   return (
@@ -117,6 +132,8 @@ export default function CreateTaskForm(props: { projectId?: string }) {
                 )}
               />
             </div>
+
+            {/* {Description} */}
             <div>
               <FormField
                 control={form.control}
@@ -137,6 +154,9 @@ export default function CreateTaskForm(props: { projectId?: string }) {
                 )}
               />
             </div>
+
+            {/* {ProjectId} */}
+
             {!projectId && (
               <div>
                 <FormField
@@ -155,6 +175,11 @@ export default function CreateTaskForm(props: { projectId?: string }) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          {isLoading && (
+                            <div className="my-2">
+                              <Loader className="w-4 h-4 place-self-center flex animate-spin" />
+                            </div>
+                          )}
                           <SelectItem value="m@example.com">
                             m@example.com
                           </SelectItem>
@@ -172,6 +197,8 @@ export default function CreateTaskForm(props: { projectId?: string }) {
                 />
               </div>
             )}
+
+            {/* {Members AssigneeTo} */}
 
             <div>
               <FormField
@@ -207,6 +234,7 @@ export default function CreateTaskForm(props: { projectId?: string }) {
               />
             </div>
 
+            {/* {Due Date} */}
             <div className="!mt-2">
               <FormField
                 control={form.control}
@@ -238,10 +266,15 @@ export default function CreateTaskForm(props: { projectId?: string }) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
+                          disabled={
+                            (date) =>
+                              date <
+                                new Date(new Date().setHours(0, 0, 0, 0)) || // Disable past dates
+                              date > new Date("2100-12-31") //Prevent selection beyond a far future date
                           }
                           initialFocus
+                          defaultMonth={new Date()}
+                          fromMonth={new Date()}
                         />
                       </PopoverContent>
                     </Popover>
@@ -250,6 +283,8 @@ export default function CreateTaskForm(props: { projectId?: string }) {
                 )}
               />
             </div>
+
+            {/* {Status} */}
 
             <div>
               <FormField
@@ -288,6 +323,7 @@ export default function CreateTaskForm(props: { projectId?: string }) {
               />
             </div>
 
+            {/* {Priority} */}
             <div>
               <FormField
                 control={form.control}
@@ -326,6 +362,7 @@ export default function CreateTaskForm(props: { projectId?: string }) {
               className="flex place-self-end  h-[40px] text-white font-semibold"
               type="submit"
             >
+              <Loader className="animate-spin" />
               Create
             </Button>
           </form>

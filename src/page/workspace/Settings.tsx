@@ -1,24 +1,12 @@
-import EditWorkspaceForm from "@/components/forms/edit-workspace-form";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import WorkspaceHeader from "@/components/workspace/common/workspace-header";
+import EditWorkspaceForm from "@/components/workspace/edit-workspace-form";
 import DeleteWorkspaceCard from "@/components/workspace/settings/delete-workspace-card";
 
 const Settings = () => {
   return (
     <div className="w-full h-auto py-2">
-      <div className="w-full max-w-3xl mx-auto pb-2">
-        <div className="flex items-center gap-4">
-          <Avatar className="size-[60px] rounded-lg font-bold text-[35px] ">
-            <AvatarFallback className="rounded-lg bg-gradient-to-tl to-black  from-black text-white">
-              AI
-            </AvatarFallback>
-          </Avatar>
-          <div className="grid flex-1 text-left leading-tight">
-            <span className="truncate font-semibold text-xl">Acme Inc</span>
-            <span className="truncate text-sm">Free</span>
-          </div>
-        </div>
-      </div>
+      <WorkspaceHeader />
       <Separator className="my-4 " />
       <main>
         <div className="w-full max-w-3xl mx-auto py-3">

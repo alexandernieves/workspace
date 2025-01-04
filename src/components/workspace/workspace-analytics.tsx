@@ -22,7 +22,12 @@ const WorkspaceAnalytics = () => {
   return (
     <div className="grid gap-4 md:gap-5 lg:grid-cols-2 xl:grid-cols-3">
       {workspaceList?.map((v) => (
-        <AnalyticsCard title={v.title} value={v.value} key={v.id} />
+        <AnalyticsCard
+          key={v.id}
+          isLoading={false}
+          title={v.title}
+          value={v.value}
+        />
       ))}
     </div>
   );

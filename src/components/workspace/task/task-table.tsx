@@ -1,68 +1,167 @@
-import React, { useEffect } from "react";
-import { ColumnFiltersState } from "@tanstack/react-table";
-import { columns } from "./data-table/columns";
-import { taskDummyData } from "./data-table/data";
-import { DataTable } from "./data-table/table";
+import { FC, useState } from "react";
+import { getColumns } from "./table/columns";
+import { DataTable } from "./table/table";
+import { useParams } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { DataTableFacetedFilter } from "./table/table-faceted-filter";
+import { priorities, statuses } from "./table/data";
 import useTaskTableFilter from "@/hooks/use-task-table-filter";
 
+type Filters = ReturnType<typeof useTaskTableFilter>[0];
+type SetFilters = ReturnType<typeof useTaskTableFilter>[1];
+
+interface DataTableFilterToolbarProps {
+  isLoading?: boolean;
+  projectId?: string;
+  filters: Filters;
+  setFilters: SetFilters;
+}
+
 const TaskTable = () => {
+  const param = useParams();
+  const projectId = param.projectId as string;
+
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   const [filters, setFilters] = useTaskTableFilter();
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  const columns = getColumns(projectId);
 
-  useEffect(() => {
-    const formattedFilters = Object.entries(filters).map(([id, value]) => {
-      const formattedValue =
-        typeof value === "string" && value.includes(",")
-          ? value.split(",").map((v) => v.trim()) // Split by comma and trim each value
-          : value;
+  const totalCount = 0;
 
-      return {
-        id,
-        value: formattedValue,
-      };
-    });
-
-    if (formattedFilters.length > 0) setColumnFilters(formattedFilters);
-    else setColumnFilters([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleFilter = (
-    updater:
-      | ColumnFiltersState
-      | ((old: ColumnFiltersState) => ColumnFiltersState)
-  ) => {
-    const newFilters =
-      typeof updater === "function" ? updater(columnFilters) : updater;
-
-    console.log(newFilters, "newFilters");
-
-    setColumnFilters(newFilters);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedFilters = newFilters.reduce<Record<string, any>>(
-      (acc, filter) => {
-        acc[filter.id] = filter.value;
-        return acc;
-      },
-      {}
-    );
-    const _formattedFilters =
-      Object.keys(formattedFilters).length === 0 ? null : formattedFilters;
-
-    setFilters(_formattedFilters);
+  const handlePageChange = (page: number) => {
+    setPageNumber(page);
   };
 
-  console.log(filters, "filters");
+  // Handle page size changes
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+  };
 
   return (
-    <DataTable
-      data={taskDummyData}
-      columns={columns}
-      columnFilters={columnFilters}
-      onColumnFiltersChange={handleFilter}
-    />
+    <div className="w-full relative">
+      <DataTable
+        isLoading={false}
+        data={[]}
+        columns={columns}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        pagination={{
+          totalCount,
+          pageNumber,
+          pageSize,
+        }}
+        filtersToolbar={
+          <DataTableFilterToolbar
+            isLoading={false}
+            projectId={projectId}
+            filters={filters}
+            setFilters={setFilters}
+          />
+        }
+      />
+    </div>
+  );
+};
+
+const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
+  isLoading,
+  projectId,
+  filters,
+  setFilters,
+}) => {
+  //const workspaceId = useWorkspaceId();
+
+  //Workspace Projects
+  //const projectOptions = [];
+
+  // Workspace Memebers
+  //const assignees = []
+
+  const handleFilterChange = (key: keyof Filters, values: string[]) => {
+    setFilters({
+      ...filters,
+      [key]: values.length > 0 ? values.join(",") : null,
+    });
+  };
+
+  return (
+    <div className="flex flex-col lg:flex-row w-full items-start space-y-2 mb-2 lg:mb-0 lg:space-x-2  lg:space-y-0">
+      <Input
+        placeholder="Filter tasks..."
+        value={filters.keyword || ""}
+        onChange={(e) =>
+          setFilters({
+            keyword: e.target.value,
+          })
+        }
+        className="h-8 w-full lg:w-[250px]"
+      />
+      {/* Status filter */}
+      <DataTableFacetedFilter
+        title="Status"
+        multiSelect={true}
+        options={statuses}
+        disabled={isLoading}
+        selectedValues={filters.status?.split(",") || []}
+        onFilterChange={(values) => handleFilterChange("status", values)}
+      />
+
+      {/* Priority filter */}
+      <DataTableFacetedFilter
+        title="Priority"
+        multiSelect={true}
+        options={priorities}
+        disabled={isLoading}
+        selectedValues={filters.priority?.split(",") || []}
+        onFilterChange={(values) => handleFilterChange("priority", values)}
+      />
+
+      {/* Assigned To filter */}
+      <DataTableFacetedFilter
+        title="Assigned To"
+        multiSelect={true}
+        options={[]}
+        disabled={isLoading}
+        selectedValues={filters.assigneeId?.split(",") || []}
+        onFilterChange={(values) => handleFilterChange("assigneeId", values)}
+      />
+
+      {!projectId && (
+        <DataTableFacetedFilter
+          title="Projects"
+          multiSelect={false}
+          options={[]}
+          disabled={isLoading}
+          selectedValues={filters.projectId?.split(",") || []}
+          onFilterChange={(values) => handleFilterChange("projectId", values)}
+        />
+      )}
+
+      {Object.values(filters).some(
+        (value) => value !== null && value !== ""
+      ) && (
+        <Button
+          disabled={isLoading}
+          variant="ghost"
+          className="h-8 px-2 lg:px-3"
+          onClick={() =>
+            setFilters({
+              keyword: null,
+              status: null,
+              priority: null,
+              projectId: null,
+              assigneeId: null,
+            })
+          }
+        >
+          Reset
+          <X />
+        </Button>
+      )}
+    </div>
   );
 };
 

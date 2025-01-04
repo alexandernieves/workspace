@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -17,10 +18,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "../../ui/textarea";
-import { useState } from "react";
 import EmojiPickerComponent from "@/components/emoji-picker";
+import { ProjectType } from "@/types/api.type";
 
-export default function EditProjectForm() {
+export default function EditProjectForm(props: {
+  project?: ProjectType;
+  onClose: () => void;
+}) {
+  const { onClose } = props;
+
   const [emoji, setEmoji] = useState("📊");
 
   const formSchema = z.object({
@@ -44,6 +50,7 @@ export default function EditProjectForm() {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
+    onClose();
   };
 
   return (

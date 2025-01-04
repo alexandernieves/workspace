@@ -58,7 +58,8 @@ export default function EditWorkspaceForm() {
                     <FormControl>
                       <Input
                         placeholder="Taco's Co."
-                        className="!h-[48px]"
+                        className="!h-[48px] disabled:opacity-90 disabled:pointer-events-none"
+                        disabled={false}
                         {...field}
                       />
                     </FormControl>
@@ -82,6 +83,8 @@ export default function EditWorkspaceForm() {
                     <FormControl>
                       <Textarea
                         rows={6}
+                        disabled={false}
+                        className="disabled:opacity-90 disabled:pointer-events-none"
                         placeholder="Our team organizes marketing projects and tasks here."
                         {...field}
                       />
@@ -91,11 +94,13 @@ export default function EditWorkspaceForm() {
                 )}
               />
             </div>
-
+            {/* {canEditWorkspace && ( */}
             <Button
               className="flex place-self-end  h-[40px] text-white font-semibold"
+              disabled={false}
               type="submit"
             >
+              {/* {false && <Loader className="animate-spin" />} */}
               Update Workspace
             </Button>
           </form>

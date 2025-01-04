@@ -24,31 +24,54 @@ import useCreateWorkspaceDialog from "@/hooks/use-create-workspace-dialog";
 type WorkspaceType = {
   id: string;
   name: string;
-  logo: React.ElementType;
   plan: string;
 };
 
-export function WorkspaceSwitcher({
-  workspaces,
-}: {
-  workspaces: WorkspaceType[];
-}) {
+export function WorkspaceSwitcher() {
   const navigate = useNavigate();
   const { isMobile } = useSidebar();
 
   const { onOpen } = useCreateWorkspaceDialog();
   const workspaceId = useWorkspaceId();
 
-  const [activeWorkspace, setActiveWorkspace] = React.useState(workspaces[0]);
+  const [activeWorkspace, setActiveWorkspace] = React.useState<WorkspaceType>();
+
+  const workspaces = [
+    {
+      id: "my-wo8483727",
+      name: "Acme Inc",
+      plan: "Free",
+    },
+    {
+      id: "ym28483727",
+      name: "Acme Corp.",
+      plan: "Free",
+    },
+    {
+      id: "cc88483727",
+      name: "Evil Corp.",
+      plan: "Free",
+    },
+  ];
 
   React.useEffect(() => {
-    if (workspaceId) {
+    if (workspaceId && workspaces?.length) {
       const workspace = workspaces.find(
         (workspace) => workspace.id === workspaceId
       );
-      if (workspace) setActiveWorkspace(workspace);
+      if (workspace) {
+        setActiveWorkspace(workspace);
+        return;
+      }
     }
-  }, [workspaceId, workspaces]);
+
+    if (workspaces?.length) {
+      const firstWorkspace = workspaces[0];
+      setActiveWorkspace(firstWorkspace);
+      navigate(`/workspace/${firstWorkspace?.id}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workspaceId]);
 
   const onSelect = (workspace: WorkspaceType) => {
     setActiveWorkspace(workspace);
@@ -74,15 +97,15 @@ export function WorkspaceSwitcher({
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground bg-gray-10"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <activeWorkspace.logo className="size-4" />
+                <div className="flex aspect-square size-8 items-center font-semibold justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  {activeWorkspace?.name?.split(" ")?.[0]?.charAt(0)}
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {activeWorkspace.name}
+                    {activeWorkspace?.name}
                   </span>
                   <span className="truncate text-xs">
-                    {activeWorkspace.plan}
+                    {activeWorkspace?.plan}
                   </span>
                 </div>
                 <ChevronDown className="ml-auto" />
@@ -104,7 +127,7 @@ export function WorkspaceSwitcher({
                   className="gap-2 p-2 !cursor-pointer"
                 >
                   <div className="flex size-6 items-center justify-center rounded-sm border">
-                    <workspace.logo className="size-4 shrink-0" />
+                    {workspace?.name?.split(" ")?.[0]?.charAt(0)}
                   </div>
                   {workspace.name}
 

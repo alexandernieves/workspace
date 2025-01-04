@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Command,
-  EllipsisIcon,
-  GalleryHorizontal,
-  GalleryVerticalEnd,
-  Loader,
-  LogOut,
-} from "lucide-react";
+import { EllipsisIcon, Loader, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarHeader,
@@ -46,27 +39,6 @@ const Asidebar = () => {
 
   const isLoading = false;
 
-  const workspaces = [
-    {
-      id: "my-wo8483727",
-      name: "Acme Inc",
-      logo: GalleryHorizontal,
-      plan: "Free",
-    },
-    {
-      id: "ym28483727",
-      name: "Acme Corp.",
-      logo: GalleryVerticalEnd,
-      plan: "Free",
-    },
-    {
-      id: "cc88483727",
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ];
-
   return (
     <>
       <Sidebar collapsible="icon">
@@ -86,7 +58,7 @@ const Asidebar = () => {
         <SidebarContent className=" !mt-0 dark:bg-background">
           <SidebarGroup className="!py-0">
             <SidebarGroupContent>
-              <WorkspaceSwitcher workspaces={workspaces} />
+              <WorkspaceSwitcher />
               <Separator />
               <NavMain />
               <Separator />
