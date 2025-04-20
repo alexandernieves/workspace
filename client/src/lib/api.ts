@@ -13,6 +13,7 @@ import {
   EditProjectPayloadType,
   ProjectByIdPayloadType,
   ProjectResponseType,
+  EditTaskPayloadType,
 } from "../types/api.type";
 import {
   AllWorkspaceResponseType,
@@ -23,6 +24,7 @@ import {
   registerType,
   WorkspaceByIdResponseType,
   EditWorkspaceType,
+  TaskType,
 } from "@/types/api.type";
 
 export const loginMutationFn = async (
@@ -229,6 +231,40 @@ export const getAllTasksQueryFn = async ({
 
   const url = queryParams.toString() ? `${baseUrl}?${queryParams}` : baseUrl;
   const response = await API.get(url);
+  return response.data;
+};
+
+
+// edit Task MutationFn
+export const editTaskMutationFn= async ({
+  workspaceId,
+  projectId,
+  taskId,
+  data,
+}: EditTaskPayloadType) => {
+ 
+  const response = await API.put(
+    `/task/${taskId}/project/${projectId}/workspace/${workspaceId}/update`,
+    data
+  );
+  return response.data;
+};
+
+//get task by Id
+export const getTaskByIdQueryFn = async ({
+  workspaceId,
+  projectId,
+  taskId,
+}: {
+  workspaceId: string;
+  projectId: string;
+  taskId: string;
+}): Promise<{
+  task: TaskType;
+}> => {
+  const response = await API.get(
+    `/task/${taskId}/project/${projectId}/workspace/${workspaceId}`
+  );
   return response.data;
 };
 

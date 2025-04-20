@@ -17,6 +17,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useWorkspaceId from "@/hooks/use-workspace-id";
 import { deleteTaskMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { Dialog, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
+import { DialogContent } from "@/components/ui/dialog";
+import EditTaskForm from "../edit-task-form";
+
 
 interface DataTableRowActionsProps {
   row: Row<TaskType>;
@@ -33,6 +37,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
   const taskId = row.original._id as string;
   const taskCode = row.original.taskCode;
+  const projectId = row.original.project?._id as string;
 
   const handleConfirm = () => {
     mutate(
@@ -76,9 +81,22 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem className="cursor-pointer">
-            Edit Task
-          </DropdownMenuItem>
+          {/* Edit Task */}
+          <Dialog>
+            <DialogTrigger asChild>
+              <DropdownMenuItem className="cursor-pointer"
+               onSelect={(event) => {
+                event.preventDefault(); // Prevents menu from closing
+              }}
+              >
+                Edit Task
+              </DropdownMenuItem>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Edit Task</DialogTitle>
+              <EditTaskForm taskId={taskId} projectId={projectId} />
+            </DialogContent>
+          </Dialog>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className={`!text-destructive cursor-pointer ${taskId}`}
