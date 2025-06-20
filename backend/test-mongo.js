@@ -1,6 +1,6 @@
-const mongoose = require('mongoose'); // <-- ESTO FALTABA
+const uri = "mongodb://alexcode:alexcodeworkspace@cluster0-shard-00-00.kqwhh3k.mongodb.net:27017,cluster0-shard-00-01.kqwhh3k.mongodb.net:27017,cluster0-shard-00-02.kqwhh3k.mongodb.net:27017/admin?ssl=true&replicaSet=atlas-v11nkj-shard-0&authSource=admin&retryWrites=true&w=majority";
 
-const uri = "mongodb+srv://alexcode:alexcodeworkspace@cluster0.kqwhh3k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
 
 (async () => {
   try {
