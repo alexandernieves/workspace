@@ -2,6 +2,7 @@ import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import session from "express-session";
+import MongoStore from "connect-mongo";
 import { config } from "./config/app.config";
 import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
@@ -44,6 +45,10 @@ app.use(
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: config.MONGO_URI,
+      touchAfter: 24 * 3600, // lazy session update
+    }),
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
       secure: config.NODE_ENV === "production",
