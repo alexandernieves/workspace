@@ -6,6 +6,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { config } from "./app.config";
 import { NotFoundException } from "../utils/appError";
 import { ProviderEnum } from "../enums/account-provider.enum";
+import { UserModel } from "../models/user.model";
 import {
   loginOrCreateAccountService,
   verifyUserService,
@@ -62,5 +63,18 @@ passport.use(
   )
 );
 
-passport.serializeUser((user: any, done) => done(null, user));
-passport.deserializeUser((user: any, done) => done(null, user));
+passport.serializeUser((user: any, done) => {
+  done(null, user._id);
+});
+
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await UserModel.findById(id);
+    if (!user) {
+      return done(new Error("User not found"), null);
+    }
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
