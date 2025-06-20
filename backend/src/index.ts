@@ -81,7 +81,20 @@ app.use(`${BASE_PATH}/comment`, isAuthenticated, commentRoutes);
 
 app.use(errorHandler);
 
-app.listen(config.PORT, async () => {
-  console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
-  await connectDatabase();
-});
+const startServer = async () => {
+  try {
+    // Connect to database first
+    await connectDatabase();
+    console.log('Database connected successfully');
+    
+    // Start server only after database connection is established
+    app.listen(config.PORT, () => {
+      console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
