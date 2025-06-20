@@ -2,7 +2,6 @@ import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import session from "express-session";
-import MongoStore from "connect-mongo";
 import { config } from "./config/app.config";
 import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
@@ -26,6 +25,7 @@ import commentRoutes from "./routes/comment.route";
 const app = express();
 const BASE_PATH = config.BASE_PATH;
 
+
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
@@ -39,21 +39,18 @@ app.use(
   })
 );
 
+
 app.use(
   session({
     name: "session",
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: config.MONGO_URI,
-      touchAfter: 24 * 3600, // lazy session update
-    }),
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
-      secure: config.NODE_ENV === "production",
+      secure: config.NODE_ENV === "development",
       httpOnly: true,
-      sameSite: config.NODE_ENV === "production" ? "none" : "lax",
+      sameSite: config.NODE_ENV === "development" ? "none" : "lax",
     },
   })
 );
@@ -61,9 +58,15 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+
 app.get(
   `/`,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    throw new BadRequestException(
+      "This is a bad request",
+      ErrorCodeEnum.AUTH_INVALID_TOKEN
+    );
     return res.status(HTTPSTATUS.OK).json({
       message: "Hello Subscribe to the channel & share",
     });
@@ -81,20 +84,7 @@ app.use(`${BASE_PATH}/comment`, isAuthenticated, commentRoutes);
 
 app.use(errorHandler);
 
-const startServer = async () => {
-  try {
-    // Connect to database first
-    await connectDatabase();
-    console.log('Database connected successfully');
-    
-    // Start server only after database connection is established
-    app.listen(config.PORT, () => {
-      console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-};
-
-startServer();
+app.listen(config.PORT, async () => {
+  console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
+  await connectDatabase();
+});
