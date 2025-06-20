@@ -7,7 +7,6 @@ const connectDatabase = async () => {
     const options = {
       serverSelectionTimeoutMS: 30000, // 30 seconds
       socketTimeoutMS: 45000, // 45 seconds
-      bufferMaxEntries: 0, // Disable mongoose buffering
       maxPoolSize: 10, // Maintain up to 10 socket connections
       minPoolSize: 5, // Maintain a minimum of 5 socket connections
     };
