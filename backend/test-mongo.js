@@ -1,5 +1,4 @@
-// test-mongo.js
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // <-- ESTO FALTABA
 
 const uri = "mongodb+srv://alexcode:alexcodeworkspace@cluster0.kqwhh3k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
