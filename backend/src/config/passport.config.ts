@@ -6,7 +6,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { config } from "./app.config";
 import { NotFoundException } from "../utils/appError";
 import { ProviderEnum } from "../enums/account-provider.enum";
-import { UserModel } from "../models/user.model";
+import UserModel from "../models/user.model";
 import {
   loginOrCreateAccountService,
   verifyUserService,
