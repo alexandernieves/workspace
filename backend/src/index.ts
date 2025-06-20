@@ -25,7 +25,6 @@ import commentRoutes from "./routes/comment.route";
 const app = express();
 const BASE_PATH = config.BASE_PATH;
 
-
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
@@ -38,7 +37,6 @@ app.use(
     credentials: true,
   })
 );
-
 
 app.use(
   session({
@@ -57,8 +55,6 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 
 app.get(
   `/`,
