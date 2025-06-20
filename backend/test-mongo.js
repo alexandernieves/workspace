@@ -1,5 +1,5 @@
 // test-mongo.js
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const uri = "mongodb+srv://alexcode:alexcodeworkspace@cluster0.kqwhh3k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
